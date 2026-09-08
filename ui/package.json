@@ -1,0 +1,393 @@
+{
+  "name": "codex-notifier-ui",
+  "displayName": "Codex 会话通知",
+  "description": "VS Code Codex 会话提醒：声音、窗口标记、未读与跳转。Notifications and session navigation for Codex in VS Code.",
+  "version": "0.4.1",
+  "publisher": "lengmo1996",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "categories": [
+    "Extension Packs",
+    "Other"
+  ],
+  "extensionPack": [
+    "lengmo1996.codex-notifier-collector"
+  ],
+  "extensionKind": [
+    "ui"
+  ],
+  "api": "none",
+  "main": "./extension.js",
+  "activationEvents": [
+    "onStartupFinished",
+    "onCommand:codexNotifier.internal.receive",
+    "onCommand:codexNotifier.internal.snapshot"
+  ],
+  "capabilities": {
+    "virtualWorkspaces": false,
+    "untrustedWorkspaces": {
+      "supported": true
+    }
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "codexNotifier.chooseOpenLocation",
+        "title": "Codex 通知：选择会话打开位置 / Choose session opening location"
+      },
+      {
+        "command": "codexNotifier.checkInstallation",
+        "title": "Codex 通知：检查／安装当前环境组件 / Check / install components for this environment"
+      },
+      {
+        "command": "codexNotifier.menu",
+        "title": "Codex 通知：打开菜单 / Open notification menu"
+      },
+      {
+        "command": "codexNotifier.testNotification",
+        "title": "Codex 通知：测试本机弹窗和声音 / Test desktop notification and sound"
+      },
+      {
+        "command": "codexNotifier.showHistory",
+        "title": "Codex 通知：查看通知历史 / Show notification history"
+      },
+      {
+        "command": "codexNotifier.openNext",
+        "title": "Codex 通知：打开下一条待处理会话 / Open next unread session"
+      },
+      {
+        "command": "codexNotifier.showEntry",
+        "title": "打开对应会话并标为已读 / Open session and mark this notification read",
+        "icon": "$(go-to-file)"
+      },
+      {
+        "command": "codexNotifier.markEntryRead",
+        "title": "静默标为已读 / Mark read silently",
+        "icon": "$(check)"
+      },
+      {
+        "command": "codexNotifier.showEntryDetails",
+        "title": "查看通知详情 / Show notification details"
+      },
+      {
+        "command": "codexNotifier.pause",
+        "title": "Codex 通知：暂停提醒（继续记录） / Pause alerts (keep recording)"
+      },
+      {
+        "command": "codexNotifier.resume",
+        "title": "Codex 通知：恢复提醒 / Resume alerts"
+      },
+      {
+        "command": "codexNotifier.markRead",
+        "title": "Codex 通知：全部标为已读 / Mark all read",
+        "icon": "$(check-all)"
+      },
+      {
+        "command": "codexNotifier.clearHistory",
+        "title": "Codex 通知：清空全部通知 / Clear all notifications",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "codexNotifier.configureApprovalHook",
+        "title": "Codex 通知：配置当前环境的审批提醒 / Configure approval reminders for this environment"
+      },
+      {
+        "command": "codexNotifier.removeApprovalHook",
+        "title": "Codex 通知：移除当前环境的审批提醒 / Remove approval reminders for this environment"
+      },
+      {
+        "command": "codexNotifier.showStatus",
+        "title": "Codex 通知：查看连接状态 / Show connection status"
+      },
+      {
+        "command": "codexNotifier.settings",
+        "title": "Codex 通知：打开设置 / Notification settings"
+      },
+      {
+        "command": "codexNotifier.deleteEntry",
+        "title": "删除这条通知 / Delete this notification",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "codexNotifier.clearRead",
+        "title": "Codex 通知：清空已读通知 / Clear read notifications",
+        "icon": "$(clear-all)"
+      },
+      {
+        "command": "codexNotifier.testCollector",
+        "title": "Codex 通知：测试当前窗口采集链路 / Test collection in this window"
+      },
+      {
+        "command": "codexNotifier.restartCollector",
+        "title": "Codex 通知：重启当前窗口采集器 / Restart collection in this window"
+      },
+      {
+        "command": "codexNotifier.privacy",
+        "title": "Codex 通知：隐私与数据清理 / Privacy and data cleanup"
+      },
+      {
+        "command": "codexNotifier.clearPrivateData",
+        "title": "Codex 通知：清理当前环境及本机通知数据 / Clear notification data in this environment and on this computer"
+      },
+      {
+        "command": "codexNotifier.clearLocalPrivateData",
+        "title": "Codex 通知：仅清理本机全部通知缓存 / Clear all local notification caches only"
+      },
+      {
+        "command": "codexNotifier.resumePrivateData",
+        "title": "Codex 通知：恢复采集和接收 / Resume collection and reception"
+      },
+      {
+        "command": "codexNotifier.chooseLanguage",
+        "title": "Codex 通知: 选择语言 / Choose language"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "codexNotifier",
+          "title": "Codex 通知 / Notifier",
+          "icon": "assets/bell.svg"
+        }
+      ]
+    },
+    "views": {
+      "codexNotifier": [
+        {
+          "id": "codexNotifier.history",
+          "name": "通知历史 / History"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "codexNotifier.clearRead",
+          "when": "view == codexNotifier.history",
+          "group": "navigation"
+        },
+        {
+          "command": "codexNotifier.markRead",
+          "when": "view == codexNotifier.history",
+          "group": "navigation"
+        },
+        {
+          "command": "codexNotifier.clearHistory",
+          "when": "view == codexNotifier.history",
+          "group": "navigation"
+        },
+        {
+          "command": "codexNotifier.menu",
+          "when": "view == codexNotifier.history",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "codexNotifier.markEntryRead",
+          "when": "view == codexNotifier.history && viewItem == unreadNotification",
+          "group": "inline"
+        },
+        {
+          "command": "codexNotifier.showEntry",
+          "when": "view == codexNotifier.history && (viewItem == readNotification || viewItem == unreadNotification)",
+          "group": "navigation"
+        },
+        {
+          "command": "codexNotifier.showEntryDetails",
+          "when": "view == codexNotifier.history && (viewItem == readNotification || viewItem == unreadNotification)",
+          "group": "navigation"
+        },
+        {
+          "command": "codexNotifier.deleteEntry",
+          "when": "view == codexNotifier.history && (viewItem == readNotification || viewItem == unreadNotification)",
+          "group": "inline@2"
+        },
+        {
+          "command": "codexNotifier.deleteEntry",
+          "when": "view == codexNotifier.history && (viewItem == readNotification || viewItem == unreadNotification)",
+          "group": "notification"
+        },
+        {
+          "command": "codexNotifier.clearRead",
+          "when": "view == codexNotifier.history && viewItem == readNotificationGroup",
+          "group": "inline"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "codexNotifier.showEntry",
+          "when": "false"
+        },
+        {
+          "command": "codexNotifier.markEntryRead",
+          "when": "false"
+        },
+        {
+          "command": "codexNotifier.showEntryDetails",
+          "when": "false"
+        },
+        {
+          "command": "codexNotifier.deleteEntry",
+          "when": "false"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Codex 会话通知 / Session Notifier",
+      "properties": {
+        "codexNotifier.notificationsEnabled": {
+          "type": "boolean",
+          "default": true,
+          "scope": "application",
+          "description": "启用提醒。关闭时仍保存通知历史。 / Enable alerts. Turning this off still records notification history."
+        },
+        "codexNotifier.desktopNotifications": {
+          "type": "boolean",
+          "default": true,
+          "scope": "application",
+          "description": "在 Windows 显示系统托盘通知。系统勿扰可能抑制显示。 / Show Windows desktop notifications. Do Not Disturb may suppress them."
+        },
+        "codexNotifier.sound": {
+          "type": "boolean",
+          "default": true,
+          "scope": "application",
+          "description": "播放 Windows 系统提示音。 / Play the Windows notification sound."
+        },
+        "codexNotifier.taskbarAttention": {
+          "type": "boolean",
+          "default": true,
+          "scope": "application",
+          "description": "在 Windows 任务栏显示黄色／红色待处理标记，并在窗口预览标题前显示状态。首次使用会为窗口标题模板添加通知变量；已读后自动清除标记。 / Show yellow/red taskbar attention and a status prefix in window preview titles. Adds a title variable on first use; read notifications clear the indicator."
+        },
+        "codexNotifier.blinkWindowTitle": {
+          "type": "boolean",
+          "default": true,
+          "scope": "application",
+          "description": "未读时让窗口预览标题的状态圆点每 0.8 秒交替显示彩色和浅色，标为已读后停止。不播放声音，不切换焦点。 / Alternate the unread title dot every 0.8 seconds until read. Does not play sound, steal focus or flash the whole thumbnail background."
+        },
+        "codexNotifier.notifyOnDone": {
+          "type": "boolean",
+          "default": true,
+          "scope": "application",
+          "description": "本轮回复结束时提醒。 / Notify when the current response ends."
+        },
+        "codexNotifier.notifyOnApproval": {
+          "type": "boolean",
+          "default": true,
+          "scope": "application",
+          "description": "等待批准时提醒。需要配置并信任审批 hook。 / Notify when approval is required. Requires a configured and trusted approval hook."
+        },
+        "codexNotifier.notifyOnQuestion": {
+          "type": "boolean",
+          "default": true,
+          "scope": "application",
+          "description": "检测到结构化提问工具调用时提醒。 / Notify when a structured question tool call is detected."
+        },
+        "codexNotifier.onlyWhenUnfocused": {
+          "type": "boolean",
+          "default": false,
+          "scope": "application",
+          "description": "仅当前 VS Code 窗口在后台时发出提醒；前台更新仍进入历史。 / Alert only while the window is in the background; foreground events still enter history."
+        },
+        "codexNotifier.autoReadOnWindowFocus": {
+          "type": "boolean",
+          "default": false,
+          "scope": "application",
+          "description": "默认关闭：切回窗口不改变未读，点击通知仅标读该条。开启后，手动切回窗口会标读该窗口全部已有提醒，切换会话编辑器标签会标读对应会话；通知主动跳转期间不批量标读。 / Off by default: returning to a window preserves unread state, and a notification click reads only that item. When enabled, manually returning to a window reads all existing window reminders; switching conversation editor tabs reads that session. Notification navigation suspends bulk acknowledgement."
+        },
+        "codexNotifier.openLocation": {
+          "type": "string",
+          "enum": [
+            "sidebar",
+            "editor"
+          ],
+          "enumDescriptions": [
+            "Codex 插件会话侧栏（默认） / Codex session sidebar (default)",
+            "中间主编辑器区域 / Main editor area"
+          ],
+          "default": "sidebar",
+          "scope": "application",
+          "description": "点击通知后在哪里打开对应会话。侧栏跳转会先聚焦目标窗口，再请求 Codex 打开会话；若窗口焦点改变则保留未读。 / Where notification clicks open the session. Sidebar mode focuses the target window before requesting the Codex session; a detected focus change preserves unread state."
+        },
+        "codexNotifier.localCodexHome": {
+          "type": "string",
+          "default": "",
+          "scope": "machine-overridable",
+          "description": "VS Code 本地文件夹中 Codex 的配置目录；留空使用 CODEX_HOME 或 ~/.codex。仅采集 VS Code 插件会话。 / Codex home for local VS Code folders. Empty uses CODEX_HOME, then ~/.codex. Only VS Code-origin sessions are collected."
+        },
+        "codexNotifier.localPythonPath": {
+          "type": "string",
+          "default": "",
+          "scope": "machine-overridable",
+          "description": "本机 Python 可执行文件路径，不含参数；留空使用 py -3。 / Local Python executable, without arguments. Empty uses py -3."
+        },
+        "codexNotifier.localSourceLabel": {
+          "type": "string",
+          "default": "",
+          "scope": "window",
+          "description": "本地 VS Code 窗口的通知来源名称。 / Source label for notifications from local VS Code windows."
+        },
+        "codexNotifier.localCollectorEnabled": {
+          "type": "boolean",
+          "default": true,
+          "scope": "window",
+          "description": "在受信任的本地文件夹中采集 VS Code Codex 插件会话；SSH／容器窗口不会启动本地采集。 / Collect VS Code Codex sessions in trusted local folders. SSH/container windows do not start local collection."
+        },
+        "codexNotifier.soundOnDone": {
+          "type": "boolean",
+          "default": true,
+          "scope": "application",
+          "description": "本轮回复结束时播放声音，默认开启。点击通知或标读仍静音；本轮结束不代表整个项目或后台任务完成。 / Play sound when a response ends (on by default). Clicking and acknowledging are silent. Response completion does not mean the overall goal or a background job has finished."
+        },
+        "codexNotifier.desktopOnDone": {
+          "type": "boolean",
+          "default": false,
+          "scope": "application",
+          "description": "本轮回复结束时显示 Windows 系统弹窗；默认只保留颜色和未读。审批与提问仍按总弹窗开关提醒。 / Show a Windows desktop notification when a response ends. Off by default; color, unread state and sound remain available. Approval/question alerts follow the main desktop notification setting."
+        },
+        "codexNotifier.localCacheRetentionDays": {
+          "type": "integer",
+          "default": 7,
+          "minimum": 1,
+          "maximum": 30,
+          "scope": "window",
+          "description": "本环境的通知采集缓存保留天数（1–30）。采集运行时清理过期元数据；原始 Codex 对话不受影响。 / Local collector notification-cache retention (1–30 days). Expiry runs while collection is active; original Codex conversations are untouched."
+        },
+        "codexNotifier.historyRetentionDays": {
+          "type": "integer",
+          "default": 7,
+          "minimum": 1,
+          "maximum": 30,
+          "scope": "application",
+          "description": "本机共享通知历史及去重记录保留天数（1–30），默认 7 天，最多 200 条通知。旧版本缓存按文件修改时间清理。 / Local shared notification-history and deduplication retention (1–30 days). Default: 7 days, at most 200 history entries. Legacy caches expire using file modification time."
+        },
+        "codexNotifier.language": {
+          "type": "string",
+          "enum": [
+            "zh-CN",
+            "en"
+          ],
+          "default": "zh-CN",
+          "scope": "application",
+          "enumDescriptions": [
+            "中文（默认） / Chinese (default)",
+            "英文 / English"
+          ],
+          "description": "弹窗、日志及运行时界面的语言，独立于 VS Code 界面语言。更改后立即用于新提示；已有日志保持原文。 / Language for popups, logs, and runtime UI, independent of the VS Code display language. Applies to new messages immediately; existing log lines stay unchanged."
+        }
+      }
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lengmo1996/codex-vscode-notifier.git",
+    "directory": "ui"
+  },
+  "homepage": "https://github.com/lengmo1996/codex-vscode-notifier#readme",
+  "bugs": {
+    "url": "https://github.com/lengmo1996/codex-vscode-notifier/issues"
+  }
+}

@@ -1,0 +1,17 @@
+**
+!package.json
+!extension.js
+!README.md
+!LICENSE
+!CHANGELOG.md
+!lib/*.js
+!collector/src/*.js
+!collector/scripts/collector.py
+!assets/bell.svg
+!assets/show-notification.ps1
+!assets/window-attention.ps1
+!assets/window-attention.cs
+
+!PRIVACY.md
+!assets/secure-pipe.ps1
+!assets/secure-pipe.cs

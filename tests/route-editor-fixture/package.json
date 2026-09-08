@@ -1,0 +1,12 @@
+{
+  "name": "notifier-route-fixture",
+  "publisher": "notifier-test",
+  "version": "0.0.1",
+  "engines": {"vscode": "^1.96.0"},
+  "main": "./extension.js",
+  "activationEvents": ["onStartupFinished"],
+  "contributes": {"views": {"explorer": [{"type": "webview", "id": "codexRouteFixture.sidebar", "name": "Notifier sidebar fixture"}]}, "customEditors": [{
+    "viewType": "chatgpt.conversationEditor", "displayName": "Notifier route test (no Codex backend)",
+    "selector": [{"filenamePattern": "*.codex-route-fixture"}], "priority": "option"
+  }]}
+}

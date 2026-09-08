@@ -1,0 +1,99 @@
+{
+  "name": "codex-notifier-collector",
+  "displayName": "Codex 远端通知采集器（lengmo1996）",
+  "description": "SSH／容器中的 Codex 通知采集器。Remote notification collector for VS Code Codex sessions; inactive locally.",
+  "publisher": "lengmo1996",
+  "version": "0.2.5",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "extensionKind": [
+    "workspace"
+  ],
+  "api": "none",
+  "main": "./src/extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": "limited",
+      "description": "采集进程与 Hook 配置仅在受信任工作区运行。 / Collection and hook configuration run only in trusted workspaces."
+    },
+    "virtualWorkspaces": false
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "codexNotifier.remote.status",
+        "title": "Codex Notifier: 查看采集器状态 / Show collector status"
+      },
+      {
+        "command": "codexNotifier.remote.configureApprovalHook",
+        "title": "Codex Notifier: 配置审批提醒 Hook / Configure approval reminder hook"
+      },
+      {
+        "command": "codexNotifier.remote.removeApprovalHook",
+        "title": "Codex Notifier: 移除审批提醒 Hook / Remove approval reminder hook"
+      },
+      {
+        "command": "codexNotifier.remote.test",
+        "title": "Codex Notifier: 测试远端通知链路 / Test remote notification delivery"
+      },
+      {
+        "command": "codexNotifier.remote.restart",
+        "title": "Codex Notifier: 重启采集器 / Restart collector"
+      }
+    ],
+    "configuration": {
+      "title": "Codex 远端采集器 / Remote Collector",
+      "properties": {
+        "codexNotifier.codexHome": {
+          "type": "string",
+          "default": "",
+          "scope": "machine-overridable",
+          "description": "该环境的 Codex 配置目录；留空依次使用 CODEX_HOME、~/.codex。 / Codex home in this environment. Empty uses CODEX_HOME, then ~/.codex."
+        },
+        "codexNotifier.pythonPath": {
+          "type": "string",
+          "default": "",
+          "scope": "machine-overridable",
+          "description": "Python 可执行文件路径，不含参数；Linux/macOS 默认 python3，Windows 默认 py -3。 / Python executable without arguments. Defaults to python3 on Linux/macOS or py -3 on Windows."
+        },
+        "codexNotifier.sourceLabel": {
+          "type": "string",
+          "default": "",
+          "scope": "window",
+          "description": "服务器／容器的通知来源名称；留空使用连接类型和主机名，各事件携带自身项目路径。 / Server/container display label. Empty uses the connection type and hostname; each event carries its own project path."
+        },
+        "codexNotifier.collectorEnabled": {
+          "type": "boolean",
+          "default": true,
+          "scope": "window",
+          "description": "在此受信任工作区打开时读取 Codex 事件元数据。 / Read Codex event metadata while this trusted workspace is open."
+        },
+        "codexNotifier.cacheRetentionDays": {
+          "type": "integer",
+          "default": 7,
+          "minimum": 1,
+          "maximum": 30,
+          "scope": "window",
+          "description": "本环境通知采集缓存保留天数（1–30）；采集运行时清理过期元数据，不影响原始对话。 / Collector notification-cache retention in this environment (1–30 days). Expiry runs during collection; original conversations are untouched."
+        }
+      }
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lengmo1996/codex-vscode-notifier.git",
+    "directory": "remote"
+  },
+  "homepage": "https://github.com/lengmo1996/codex-vscode-notifier#readme",
+  "bugs": {
+    "url": "https://github.com/lengmo1996/codex-vscode-notifier/issues"
+  }
+}

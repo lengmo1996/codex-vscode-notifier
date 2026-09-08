@@ -1,0 +1,42 @@
+name: 问题反馈 / Bug report
+description: 提供版本、环境及复现步骤 / Versions, environment, and reproduction steps
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: 请先遮盖私人路径、主机地址、会话标识和正文。不要上传凭据或真实会话文件。安全问题请查看 SECURITY.md。 / Redact private data. Do not upload credentials or real sessions. See SECURITY.md for security issues.
+  - type: input
+    id: versions
+    attributes:
+      label: 扩展与 VS Code 版本 / Extension and VS Code versions
+      description: 主扩展、采集器、Codex 与 VS Code 版本。 / Main extension, collector, Codex, and VS Code versions.
+    validations:
+      required: true
+  - type: dropdown
+    id: environment
+    attributes:
+      label: 窗口环境 / Window environment
+      options:
+        - 本地文件夹 / Local folder
+        - Remote SSH
+        - 容器 / Container
+        - 多种环境 / Multiple environments
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: 复现步骤 / Steps to reproduce
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: 预期与实际结果 / Expected and actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: 已脱敏的补充信息 / Redacted diagnostics
+      description: 仅提供必要错误摘要，不要粘贴完整日志。 / Include necessary error excerpts only, not complete logs.
