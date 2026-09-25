@@ -3,7 +3,7 @@ const {t, getLanguage, configureLanguage, renderMessage, diagnostic} = require('
 const vscode = require('vscode');
 const path = require('node:path');
 const {BrokerClient} = require('./lib/client');
-const {clean, projectName, eventTitle, notificationOptions, validEnvelope, attention} = require('./lib/presentation');
+const {clean, projectName, eventTitle, notificationOptions, validEnvelope, attention, showWindowAlert} = require('./lib/presentation');
 const {HistoryView} = require('./lib/history');
 const {openCodexSession} = require('./lib/navigation');
 const {WindowAttention} = require('./lib/window-attention');
@@ -332,6 +332,15 @@ async function activate(context) {
     refresh().catch(error => log(error.message));
   });
   client.on('historyChanged', () => refresh().catch(error => log(error.message)));
+  client.on('desktopAlert', message => {
+    if (!config().get('notificationsEnabled', true) || !config().get('desktopNotifications', true)) return;
+    const generation = privacyGeneration;
+    showWindowAlert(vscode, message, {
+      cancelled: () => disposed || generation !== privacyGeneration,
+      open: key => vscode.commands.executeCommand('codexNotifier.showEntry', key),
+      history: () => vscode.commands.executeCommand('codexNotifier.showHistory'),
+    }).catch(error => log(error.message));
+  });
   client.on('connected', () => { log(t('本机通知组件已连接')); lastRegistration = ''; windowAttention.reset(); syncWindow().catch(error => log(error.message)); });
   client.on('disconnected', () => { lastRegistration = ''; log(t('本机通知组件断开，将自动重连')); });
   client.on('openEntry', message => {

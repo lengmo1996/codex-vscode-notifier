@@ -1,5 +1,12 @@
 # 0.3.4
 
+## 0.4.2
+
+- 开启桌面提醒时，同时在当前前台 VS Code 窗口显示可点击提示，不再只依赖 Windows 系统气泡。单条提示跳转到来源窗口；合并提示打开通知历史。点击不额外播放声音，关闭提示不标读。
+- When desktop alerts are enabled, also show a clickable message in the foreground VS Code window. A single alert routes to its source window; a batch opens notification history. Clicking adds no sound; dismissing does not mark notifications read.
+- 回复结束提醒仍需开启 `codexNotifier.desktopOnDone`。升级后请在任务空闲时关闭所有 VS Code 窗口，等待 10 秒再打开，以替换共享通知后台。
+- Reply completion popups still require `codexNotifier.desktopOnDone`. After upgrading, close all VS Code windows when tasks are idle, wait 10 seconds, then reopen to replace the shared notification backend.
+
 ## 0.4.1
 
 - 新增公开 GitHub 仓库、双语首页、下载和问题反馈入口；运行逻辑与上一版本一致。

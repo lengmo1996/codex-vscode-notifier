@@ -17,6 +17,43 @@ const storage = label => path.resolve(__dirname, 'runtime', label + '-' + crypto
 // These cases exercise delivery cancellation, so explicitly enable done alerts.
 const doneDeliveryPolicy = {soundOnDone: true, desktopOnDone: true};
 
+test('background completion alerts the foreground client and routes its click back to the owner', {timeout: 12000}, async () => {
+  const directory = storage('foreground-alert');
+  const a = new BrokerClient(directory, path.resolve(__dirname, '../ui/lib/broker.js'));
+  const b = new BrokerClient(directory, path.resolve(__dirname, '../ui/lib/broker.js'));
+  const native = new EventEmitter();
+  let nativeCalls = 0;
+  native.close = () => {};
+  native.deliver = async () => {nativeCalls++;}; // Shell acceptance does not prove visibility.
+  const broker = startBroker({storage: directory, pipe: a.pipe, nativeNotifier: native, noNative: true,
+    batchOptions: {batchMs: 20, intervalMs: 10}});
+  const alertsA = [], alertsB = [], opens = [];
+  a.on('desktopAlert', value => alertsA.push(value));
+  b.on('desktopAlert', value => alertsB.push(value));
+  a.on('openEntry', value => opens.push(value));
+  try {
+    await once(broker.server, 'listening');
+    await Promise.all([a.connect(), b.connect()]);
+    for (const [client, cwd, focused] of [[a, '/a', false], [b, '/b', true]]) {
+      await client.request('window', {window: {id: client.clientId, sourceId: source.id,
+        workspaceCwd: cwd, workspaceCwds: [cwd], focused, policy: doneDeliveryPolicy}});
+    }
+    const receipt = await a.request('event', {source, event: event('foreground-alert'), options: {desktop: true, sound: true}});
+    await pause(150);
+    assert.equal(alertsA.length, 0);
+    assert.equal(alertsB.length, 1, 'Foreground VS Code must offer a clickable alert even if the system balloon is hidden');
+    assert.deepEqual(alertsB[0].keys, [receipt.key]);
+    assert.equal(nativeCalls, 1);
+    assert.equal((await b.request('openEntry', {key: receipt.key})).routed, true);
+    await pause(30);
+    assert.equal(opens[0].key, receipt.key);
+    assert.equal((await b.request('history')).entries[0].read, false);
+    await a.request('event', {source, event: event('muted-after-click'), options: {desktop: true, sound: true}});
+    await pause(80);
+    assert.equal(alertsB.length, 1, 'Clicking must suppress pending alerts for the target');
+  } finally {a.dispose(); b.dispose(); broker.close();}
+});
+
 test('acknowledgement and interaction silence only the matching window; explicit tests still work', {timeout: 12000}, async () => {
   const directory = storage('interaction');
   const a = new BrokerClient(directory, path.resolve(__dirname, '../ui/lib/broker.js'));

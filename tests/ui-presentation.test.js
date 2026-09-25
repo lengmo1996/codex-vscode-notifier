@@ -4,6 +4,23 @@ const assert = require('node:assert/strict');
 const {notificationOptions, validEnvelope, projectName, eventTitle} = require('../ui/lib/presentation');
 const config = values => ({get: (key, fallback) => key in values ? values[key] : fallback});
 
+test('foreground alert opens only the selected notification; dismissal and privacy reset do nothing', async () => {
+  const {showWindowAlert} = require('../ui/lib/presentation');
+  const opened = []; let history = 0, reset = false, dismiss = false;
+  const vscode = {window: {state: {focused: true}, showInformationMessage: async (_, action) => dismiss ? undefined : action}};
+  const handlers = {open: key => opened.push(key), history: () => history++, cancelled: () => reset};
+  await showWindowAlert(vscode, {title: 'Codex', body: 'done', keys: ['a']}, handlers);
+  assert.deepEqual(opened, ['a']);
+  await showWindowAlert(vscode, {title: 'Codex', body: 'done', keys: ['b', 'c']}, handlers);
+  assert.equal(history, 1);
+  dismiss = true;
+  await showWindowAlert(vscode, {keys: ['d']}, handlers);
+  dismiss = false;
+  vscode.window.showInformationMessage = async (_, action) => {reset = true; return action;};
+  await showWindowAlert(vscode, {keys: ['e']}, handlers);
+  assert.deepEqual(opened, ['a']);
+});
+
 test('pausing suppresses both display and sound while keeping the ingest path available', () => {
   assert.deepEqual(notificationOptions(config({notificationsEnabled: false}), false, 'approval'), {desktop: false, sound: false});
 });

@@ -46,4 +46,15 @@ function validEnvelope(payload) {
     ['done', 'approval', 'question', 'test'].includes(event.type);
 }
 
-module.exports = {clean, projectName, eventTitle, notificationOptions, validEnvelope, attention, historyGroups};
+async function showWindowAlert(vscode, message, {open, history, cancelled = () => false}) {
+  if (cancelled() || !vscode.window.state.focused || !Array.isArray(message.keys) || !message.keys.length) return;
+  const single = message.keys.length === 1;
+  const action = single ? t('打开对应会话并标为已读') : t('$(history) 查看通知历史').replace('$(history) ', '');
+  const selected = await vscode.window.showInformationMessage(
+    clean(message.title, 200) + ' · ' + clean(message.body, 1200), action);
+  if (selected !== action || cancelled()) return;
+  if (single) await open(message.keys[0]);
+  else await history();
+}
+
+module.exports = {clean, projectName, eventTitle, notificationOptions, validEnvelope, attention, historyGroups, showWindowAlert};

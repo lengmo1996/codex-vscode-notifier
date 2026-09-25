@@ -2,7 +2,7 @@
   "name": "codex-notifier-ui",
   "displayName": "Codex 会话通知",
   "description": "VS Code Codex 会话提醒：声音、窗口标记、未读与跳转。Notifications and session navigation for Codex in VS Code.",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "publisher": "lengmo1996",
   "license": "MIT",
   "engines": {

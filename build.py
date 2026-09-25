@@ -24,7 +24,7 @@ DEFAULT_OUTPUT = ROOT / "dist"
 NS = "http://schemas.microsoft.com/developer/vsx-schema/2011"
 CONTENT_NS = "http://schemas.openxmlformats.org/package/2006/content-types"
 IDS = {"ui": "codex-notifier-ui", "remote": "codex-notifier-collector"}
-VERSIONS = {"ui": "0.4.1", "remote": "0.2.5"}
+VERSIONS = {"ui": "0.4.2", "remote": "0.2.5"}
 MIMES = {".json": "application/json", ".js": "application/javascript", ".cjs": "application/javascript",
          ".ps1": "text/plain", ".py": "text/plain", ".md": "text/markdown", ".txt": "text/plain",
          ".html": "text/html", ".css": "text/css", ".svg": "image/svg+xml", ".png": "image/png",

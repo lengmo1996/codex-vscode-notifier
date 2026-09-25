@@ -183,6 +183,19 @@ function startBroker({ storage, pipe, noNative = false, idleMs = 10000, nativeNo
   const scheduler = new BatchScheduler((batch, entries) => {
     // Keep the original per-event options for revalidation before every retry.
     const original = entries.map(record => ({record, options: deliveryOptions.get(record.key) || {sound: false, desktop: false}}));
+    // System balloon acceptance is not proof of visibility. Offer one silent,
+    // clickable in-app alert in the currently focused VS Code window as well.
+    // Do this once per batch, outside the native retry loop.
+    const foreground = [...windows.windows.values()].filter(window => window.focused &&
+      window.policy?.notificationsEnabled !== false && window.policy?.desktopNotifications !== false)
+      .sort((a, b) => b.lastFocusedAt - a.lastFocusedAt)[0];
+    const recipient = foreground && [...clients].find(client => client.authenticated && client.id === foreground.id);
+    const visible = liveItems(original).filter(item => item.options.desktop);
+    if (recipient && visible.length) {
+      const alert = formatBatch(visible.map(item => ({...item,
+        record: {...item.record, notificationLanguage: foreground.language || 'zh-CN'}})));
+      send(recipient, {type: 'desktopAlert', title: alert.title, body: alert.body, keys: alert.keys});
+    }
     return native.deliver(batch, () => {
       const remaining = liveItems(original);
       return remaining.length ? formatBatch(remaining) : null;
